@@ -3,6 +3,7 @@ import mindspore as ms
 from mindcv.models import create_model 
 from mindspore import load_checkpoint, load_param_into_net
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query
+import uvicorn
 import time
 import datetime
 import uuid
@@ -13,7 +14,7 @@ from typing import List, Optional
 
 # --- CORRECTED IMPORTS: Use '.' for relative imports within the 'server' package ---
 from .api_utils import preprocess_image, post_process_predictions, CLASSES, NUM_CLASSES 
-from .api_models import ClassificationResult, AnalysisMetadata, AnalysisResult 
+from .api_models import Classification, ClassificationResult, AnalysisMetadata, AnalysisResult 
 
 # --- Configuration ---
 # Assuming you keep the checkpoint path relative to the server folder for simplicity 
@@ -85,7 +86,14 @@ async def analyze_image(
 ):
     start_time = time.time()
     image_bytes = await file.read()
-    image_name = file.filename or f"upload_{uuid.uuid4()}.jpg"
+    analysis_id = str(uuid.uuid4())
+    safe_name = os.path.basename(file.filename or f"upload_{analysis_id}.jpg")
+    extension = os.path.splitext(safe_name)[1] or ".jpg"
+    stored_filename = f"{analysis_id}{extension}"
+    stored_path = os.path.join(UPLOAD_FOLDER, stored_filename)
+    with open(stored_path, "wb") as image_file:
+        image_file.write(image_bytes)
+    image_name = stored_path
 
     try:
         input_tensor = preprocess_image(image_bytes) 
@@ -103,7 +111,6 @@ async def analyze_image(
     results.processing_time = processing_time 
     results.confidence_threshold = confidence_threshold
 
-    analysis_id = str(uuid.uuid4())
     timestamp = datetime.datetime.now()
     detections_json = results.model_dump_json(exclude={'processing_time', 'confidence_threshold'})
 
@@ -137,6 +144,7 @@ async def analyze_image(
         analysisId=analysis_id,
         timestamp=timestamp,
         imageName=image_name,
+        batchId=batch_id,
         results=results
     )
 
@@ -147,7 +155,7 @@ async def get_history():
         conn = sqlite3.connect(DATABASE_FILE)
         conn.row_factory = sqlite3.Row # Use Row factory for named access
         cursor = conn.cursor()
-        cursor.execute("SELECT analysis_id, timestamp, image_name FROM analyses ORDER BY timestamp DESC")
+        cursor.execute("SELECT analysis_id, timestamp, image_name, batch_id FROM analyses ORDER BY timestamp DESC")
         rows = cursor.fetchall()
         conn.close()
         
@@ -155,7 +163,8 @@ async def get_history():
             AnalysisMetadata(
                 analysisId=row['analysis_id'], 
                 timestamp=datetime.datetime.fromisoformat(row['timestamp']), 
-                imageName=row['image_name']
+                imageName=row['image_name'],
+                batchId=row['batch_id']
             )
             for row in rows
         ]
@@ -174,7 +183,7 @@ async def get_analysis_details(analysis_id: str):
         
         # 1. Get main analysis row
         cursor.execute(
-            "SELECT analysis_id, timestamp, image_name, processing_time, confidence_threshold, detections_json FROM analyses WHERE analysis_id = ?",
+            "SELECT analysis_id, timestamp, image_name, processing_time, confidence_threshold, batch_id FROM analyses WHERE analysis_id = ?",
             (analysis_id,)
         )
         row = cursor.fetchone()
@@ -193,7 +202,7 @@ async def get_analysis_details(analysis_id: str):
         conn.close()
         
         classifications = [
-            ClassificationResult.Classification(
+            Classification(
                 className=cr['class_name'],
                 confidence=cr['confidence']
             ) for cr in class_rows
@@ -210,6 +219,7 @@ async def get_analysis_details(analysis_id: str):
             analysisId=row['analysis_id'],
             timestamp=datetime.datetime.fromisoformat(row['timestamp']),
             imageName=row['image_name'],
+            batchId=row['batch_id'],
             results=results
         )
     except HTTPException as http_exc:
@@ -251,5 +261,4 @@ async def delete_analysis(analysis_id: str):
 if __name__ == "__main__":
     # Ensure all previous database files are deleted before running this corrected version
     # to avoid schema mismatches if the database file was created with the old schema.
-    import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)

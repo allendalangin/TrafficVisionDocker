@@ -1,37 +1,39 @@
 # TrafficVision: AI-Powered Traffic Image Assessment Platform 🚗🚦
 
-TrafficVision is a cross-platform desktop application designed for AI-powered traffic safety analysis and urban planning. It utilizes a deep learning model to accurately detect and classify key traffic objects from static images.
+TrafficVision is a modern web application designed for AI-powered traffic safety analysis and urban planning. It utilizes a deep learning model to accurately classify key traffic objects from static images through an elegant, premium web interface.
 
-The system adheres to a three-tier architecture, featuring a FastAPI server for managing the AI processing pipeline and a user-friendly Flet client for the graphical interface, allowing for efficient, automated safety assessments.
+The system features a three-tier architecture with a Flask web frontend for responsive, browser-based access, a FastAPI backend for high-performance model inference, and SQLite for persistent analysis history.
 
 ## ✨ Key Features and Functions
 
-The TrafficVision system provides comprehensive tools for traffic safety assessment and data analysis:
+The TrafficVision platform provides comprehensive tools for traffic analysis with an intuitive web experience:
 
-- **Core Object Classification**: The system detects and classifies eight critical traffic object types: person, bicycle, car, motorcycle, bus, truck, traffic light, and stop sign.
-- **Batch Processing**: Supports processing multiple traffic images sequentially for bulk analysis and automated summary report generation.
-- **Adjustable Threshold**: Allows users to configure the detection confidence threshold in real-time to adjust detection sensitivity.
-- **Analysis History**: Maintains a chronological history log of all completed single and batch analyses.
-- **Multi-Format Export**: Provides comprehensive export functionality supporting PDF, CSV, and JSON file formats for data sharing and detailed reporting.
+- **Core Traffic Classification**: The system classifies eight critical traffic object types: person, bicycle, car, motorcycle, bus, truck, traffic light, and stop sign.
+- **Single Image Analysis**: Upload and analyze individual traffic images with instant classification results and confidence scoring.
+- **Batch Processing**: Efficiently process multiple traffic images simultaneously and review results with grouped display.
+- **Adjustable Confidence Threshold**: Configure detection sensitivity in real-time to fine-tune results.
+- **Analysis History**: Browse, review, and manage all completed analyses with full image previews and metadata.
+- **Premium Web UI**: Modern, responsive design with smooth interactions and polished visual hierarchy across all pages.
 
 ## 🧠 AI Model and Architecture
 
 ### Model Details
 
-The system's core object detection capability is built using Transfer Learning.
+The system's core classification capability is built using Transfer Learning.
 
 - **Architecture**: EfficientNet-B1
 - **Training Foundation**: Pre-trained on the COCO2017 subset
-- **Performance Goal**: The system is designed to achieve a minimum of 90% mean Average Precision (mAP) and maintain processing times under 5 seconds per image.
-- **Model File**: The checkpoint file `efficientnet_b1_8class_multilabel_BEST.ckpt` is required in the `server/` directory.
+- **Performance Goal**: Designed to achieve minimum 90% mean Average Precision (mAP) with processing times under 5 seconds per image.
+- **Model File**: Requires `efficientnet_b1_8class_multilabel_BEST.ckpt` in the `server/` directory.
 
 ### Technology Stack
 
 | Component | Tier | Technology | Role |
 |-----------|------|------------|------|
-| Client | Presentation | Flet | Provides the cross-platform, pure-Python desktop interface |
-| Server | Logic | FastAPI | Asynchronous API for managing model inference and business logic |
-| Database | Data | SQLite | Storage for analysis history, detection results, and user preferences |
+| Client | Presentation | Flask + Jinja2 | Modern web interface with responsive, premium design |
+| Server | Logic | FastAPI | Asynchronous API for model inference and business logic |
+| Database | Data | SQLite | Storage for analysis history and classification results |
+| ML Framework | ML | MindSpore + MindCV | Deep learning inference engine |
 
 ## 💻 Installation and Setup
 
@@ -40,33 +42,41 @@ The system's core object detection capability is built using Transfer Learning.
 ```bash
 # Clone the repository
 git clone https://github.com/allendalangin/TrafficVision.git
-cd TrafficVisionProject
+cd TrafficVision
+
+# Create a virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install required Python packages
-pip install flet fastapi uvicorn python-multipart pydantic httpx mindspore mindcv fpdf
+pip install flask fastapi uvicorn python-multipart pydantic httpx mindspore mindcv
 ```
 
-## 2. File Setup
+### 2. File Setup
 
 Ensure the model checkpoint is correctly placed:
-- Place `efficientnet_b1_8class_multilabel_BEST.ckpt` inside the `server/` directory.
+- Place `efficientnet_b1_8class_multilabel_BEST.ckpt` in the `server/` directory.
 
 ## ▶️ Running the Application
 
-The system uses a client-server architecture and requires two separate processes to run concurrently.
+The system uses a client-server architecture and requires two separate terminal processes.
 
 ### 1. Start the FastAPI Server (Backend)
 
-Open your first terminal in the project root directory and run the server using uvicorn. This command enables hot-reloading (`--reload`) for development:
+Open a terminal in the project root directory and run:
 
 ```bash
 uvicorn server.api_server:app --reload --host 127.0.0.1 --port 8000
 ```
 
-### 2. Start the Flet Client (Frontend)
+The backend will be available at `http://127.0.0.1:8000`.
 
-Open a new terminal window in the project root directory and launch the desktop application. The Flet client will automatically attempt to connect to the running FastAPI server:
+### 2. Start the Flask Web App (Frontend)
+
+Open a new terminal window in the project root directory and run:
 
 ```bash
-flet run main.py
+python app.py
 ```
+
+The web interface will be available at `http://127.0.0.1:5000`. Simply open this URL in your browser to access the application.

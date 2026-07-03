@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <div class="page-header">
+    <a class="back-link" href="{{ url_for('history') }}">← Back to history</a>
+    <div>
+      <h2>Batch details</h2>
+      <p class="muted">Batch ID: {{ batch_id }}</p>
+    </div>
+  </div>
+  <div class="history-list">
+    {% for item in analyses %}
+      <div class="history-item">
+        <div class="history-media">
+          {% set image_name = item['imageName'] | replace('\\', '/') %}
+          <img src="{{ url_for('serve_upload', filename=image_name.split('/')[-1]) }}" alt="analysis image">
+        </div>
+        <div>
+          <strong>{{ item['imageName'] }}</strong>
+          <p class="muted">{{ item['timestamp'] }}</p>
+          <a class="btn btn-secondary" href="{{ url_for('analysis_detail', analysis_id=item['analysisId']) }}">View details</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

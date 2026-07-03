@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card premium-result">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Batch analysis complete</p>
+      <h2>Results grouped and ready</h2>
+    </div>
+    <a class="back-link" href="{{ url_for('history') }}">View history</a>
+  </div>
+  <div class="history-list">
+    {% for result in results %}
+      <div class="history-item batch-result-card">
+        <div>
+          <strong>{{ result.imageName }}</strong>
+          <p class="muted">Batch: {{ result.batch_id }}</p>
+        </div>
+        <ul>
+          {% for item in result.results.classifications %}
+            <li>{{ item.className }} — {{ (item.confidence * 100) | round(1) }}%</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

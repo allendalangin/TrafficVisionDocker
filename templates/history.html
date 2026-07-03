@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h2>Analysis history</h2>
+  {% if analyses %}
+    <div class="history-list">
+      {% for entry in analyses %}
+        {% if entry.kind == 'batch' %}
+          <div class="history-item batch-item">
+            <div>
+              <strong>Batch analysis</strong>
+              <p class="muted">{{ entry['items']|length }} images · {{ entry['items'][-1]['timestamp'] }}</p>
+              <a class="btn btn-secondary" href="{{ url_for('batch_history_detail', batch_id=entry['batch_id']) }}">View batch</a>
+            </div>
+            <form method="post" action="{{ url_for('batch_history_detail', batch_id=entry['batch_id']) }}">
+              <button class="btn btn-secondary" type="submit">Delete batch</button>
+            </form>
+          </div>
+        {% else %}
+          <div class="history-item">
+            <div class="history-media">
+              {% set item = entry['item'] %}
+              {% set image_name = item['imageName'] | replace('\\', '/') %}
+              <img src="{{ url_for('serve_upload', filename=image_name.split('/')[-1]) }}" alt="analysis image">
+            </div>
+            <div>
+              <strong>{{ item['imageName'] }}</strong>
+              <p class="muted">{{ item['timestamp'] }}</p>
+              <div class="hero-actions">
+                <a class="btn btn-secondary" href="{{ url_for('analysis_detail', analysis_id=item['analysisId']) }}">View details</a>
+                <form method="post" action="{{ url_for('analysis_detail', analysis_id=item['analysisId']) }}">
+                  <button class="btn btn-secondary" type="submit">Delete</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">No analyses have been recorded yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

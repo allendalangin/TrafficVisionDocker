@@ -19,7 +19,8 @@ class ClassificationResult(BaseModel):
 class AnalysisMetadata(BaseModel):
     analysis_id: str = Field(..., alias="analysisId")
     timestamp: datetime
-    image_name: str = Field(..., alias="imageName") 
+    image_name: str = Field(..., alias="imageName")
+    batch_id: Optional[str] = Field(None, alias="batchId")
 
 class AnalysisResult(AnalysisMetadata):
     # This now holds a ClassificationResult

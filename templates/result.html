@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card premium-result">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Analysis complete</p>
+      <h2>Results are ready</h2>
+    </div>
+    <a class="back-link" href="{{ url_for('history') }}">View history</a>
+  </div>
+  <p class="muted">Image: {{ result.imageName }}</p>
+  <div class="result-grid">
+    <div class="result-item compact-card">
+      <h3>Summary</h3>
+      <div class="summary-grid">
+        <div class="stat-pill">
+          <span>Processing time</span>
+          <strong>{{ result.results.processingTime }}s</strong>
+        </div>
+        <div class="stat-pill">
+          <span>Confidence threshold</span>
+          <strong>{{ result.results.confidenceThreshold }}</strong>
+        </div>
+      </div>
+    </div>
+    <div class="result-item compact-card">
+      <h3>Predictions</h3>
+      <ul>
+        {% for item in result.results.classifications %}
+          <li>{{ item.className }} — {{ (item.confidence * 100) | round(1) }}%</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="hero-actions">
+    <a class="btn btn-secondary" href="{{ url_for('analyze') }}">Analyze another</a>
+    <a class="btn btn-primary" href="{{ url_for('batch_analyze') }}">Try batch mode</a>
+  </div>
+</div>
+{% endblock %}

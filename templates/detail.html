@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <div class="page-header">
+    <a class="back-link" href="{{ url_for('history') }}">← Back to history</a>
+    <h2>Analysis details</h2>
+  </div>
+  <div class="detail-list">
+    <div class="detail-item detail-hero">
+      <div class="history-media">
+        {% set image_name = analysis['imageName'] | replace('\\', '/') %}
+        <img src="{{ url_for('serve_upload', filename=image_name.split('/')[-1]) }}" alt="analysis image">
+      </div>
+      <div class="detail-meta">
+        <p class="muted">Captured {{ analysis['timestamp'] }}</p>
+        <div class="summary-grid">
+          <div class="stat-pill">
+            <span>Processing time</span>
+            <strong>{{ analysis['results']['processingTime'] }}s</strong>
+          </div>
+          <div class="stat-pill">
+            <span>Confidence threshold</span>
+            <strong>{{ analysis['results']['confidenceThreshold'] }}</strong>
+          </div>
+        </div>
+        <p><strong>Image:</strong> {{ analysis['imageName'] }}</p>
+      </div>
+    </div>
+    <div class="detail-item">
+      <h3>Predictions</h3>
+      <ul>
+        {% for item in analysis['results']['classifications'] %}
+          <li>{{ item['className'] }} — {{ (item['confidence'] * 100) | round(1) }}%</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

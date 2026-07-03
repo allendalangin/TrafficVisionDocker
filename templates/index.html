@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="hero-card premium-hero-main">
+  <div class="hero-main-content">
+    <p class="eyebrow">TrafficVision AI</p>
+    <h2>Turn traffic photos into actionable intelligence</h2>
+    <p class="hero-text">Instantly classify road scenes with high-precision AI. Upload single images or batch-process entire collections in seconds.</p>
+  </div>
+</div>
+
+<div class="feature-grid">
+  <div class="feature-card">
+    <div class="feature-icon">📷</div>
+    <h3>Single Image Analysis</h3>
+    <p>Upload one image and get instant classification results with confidence scores.</p>
+    <a href="{{ url_for('analyze') }}" class="feature-link">Get started →</a>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🔀</div>
+    <h3>Batch Processing</h3>
+    <p>Analyze multiple images at once and compare results side by side.</p>
+    <a href="{{ url_for('batch_analyze') }}" class="feature-link">Process batch →</a>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">📊</div>
+    <h3>Full History</h3>
+    <p>Browse all your analyses, review classifications, and manage your results.</p>
+    <a href="{{ url_for('history') }}" class="feature-link">View all →</a>
+  </div>
+</div>
+{% endblock %}
