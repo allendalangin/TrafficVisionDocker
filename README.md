@@ -80,3 +80,19 @@ python app.py
 ```
 
 The web interface will be available at `http://127.0.0.1:5000`. Simply open this URL in your browser to access the application.
+
+
+
+# Build the Flask image
+docker build -f Dockerfile.flask -t my-flask-app .
+
+# Run the Flask container
+docker run -d -p 5000:5000 --name flask-container my-flask-app
+
+
+
+# Build the FastAPI image
+docker build -f Dockerfile.fastapi -t my-fastapi-app .
+
+# Run the FastAPI container
+docker run -d -p 8000:8000 --name fastapi-container my-fastapi-app
