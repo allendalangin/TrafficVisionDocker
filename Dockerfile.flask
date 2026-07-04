@@ -1,0 +1,13 @@
+FROM python:3.11
+WORKDIR /app
+COPY requirements.txt .
+
+# Use standard pip instead of importing uv
+RUN sed -i '/opencv-python/d' requirements.txt && \
+    sed -i '/numpy/d' requirements.txt && \
+    pip install --no-cache-dir numpy==1.26.4 opencv-python-headless==4.9.0.80 && \
+    pip install --no-cache-dir -r requirements.txt
+    
+COPY . .
+EXPOSE 5000
+CMD ["python", "app.py"]
